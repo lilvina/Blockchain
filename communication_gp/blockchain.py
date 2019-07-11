@@ -18,6 +18,15 @@ class Blockchain(object):
 
         self.new_block(previous_hash=1, proof=100)
 
+    def create_genesis_block(self):
+        block = {
+            'index': 1,
+            'timestamp': 0,
+            'transactions': [],
+            'proof': 99,
+            'previous_hash': 1,
+        }
+
     def new_block(self, proof, previous_hash=None):
         """
         Create a new Block in the Blockchain
@@ -175,6 +184,17 @@ class Blockchain(object):
 
         return False
 
+    def broadcast_new_block(self, block):
+        post_data = {'block': block}
+
+        for node in self.nodes:
+            r = request.post(f'http://{node}/block/new', json=post_data)
+
+            if r.status_code != 200:
+                print("error")
+
+
+
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -280,6 +300,27 @@ def register_nodes():
     }
     return jsonify(response), 201
 
+@app.route('/block/new', methods=['POST'])
+def new_block():
+    values = request.get_json()
+
+    required = ['block']
+
+    if not all(k in values for k in required):
+        return 'Missing values', 400
+
+        #validate sender
+
+        #validate block
+        new_block = values['block']
+        last_block = blockchain.last_block
+
+        if new_block['index'] == last_block['index'] + 1:
+            if new_block['previous_hash'] == blockchain.hash(last_block):
+                blockchain.chain.append(new_block)
+                return 'Block Accepted', 200
+
+        return 'Block Denied', 200
 
 @app.route('/nodes/resolve', methods=['GET'])
 def consensus():
