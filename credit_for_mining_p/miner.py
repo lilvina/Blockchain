@@ -41,6 +41,22 @@ if __name__ == '__main__':
     coins_mined = 0
     # Run forever until interrupted
     while True:
+
+        # if we have a file, open it and read the uuid
+        if path.exists("my_id.txt"):
+            f = open("my_id.txt", "r")
+            filter_uuid = f.read()
+            f.close()
+        else:
+            #else, create a file, generate a uuid, filter the uuid, write it to that file and close the file
+            f = open("my_id.txt", "w+")
+            my_uuid = str(uuid.uuid1())
+            filter_uuid = ""
+            for i in my_uuid:
+                if i != "-":
+                    filter_uuid = filter_uuid + i
+            f.write(filter_uuid)
+            f.close()
         # Get the last proof from the server
         r = requests.get(url=node + "/last_proof")
         data = r.json()

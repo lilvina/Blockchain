@@ -249,7 +249,8 @@ def mine():
 
     values = request.get_json()
     submitted_proof = values.get('proof')
-
+    submitted_id = values.get("id")
+    print("miner id: ", submitted_id)
     if blockchain.valid_proof(last_proof, submitted_proof):
         # We must receive a reward for finding the proof.
         # The sender is "0" to signify that this node has mine a new coin
